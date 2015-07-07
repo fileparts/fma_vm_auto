@@ -61,6 +61,52 @@ div.wrp.main {
   padding:50px 10px;
 }
 /* -- tables -- */
+table {
+  border-spacing:0;
+  border-collapse:separate;
+}
+  table tr > th,
+  table tr > td {
+    padding:8px 10px;
+  }
+table.fixed {
+  table-layout:fixed;
+}
+table.full {
+  width:100%;
+}
+  table tr.head > * {
+    background-color:#F5F5F5;
+    font-weight:500;
+    text-align:left;
+  }
+/* -- forms -- */
+form {
+  display:inline-block;
+}
+  form table tr > th,
+  form table tr > td {
+    padding:2px 10px;
+  }
+  form input,
+  form select,
+  form textarea {
+    width:300px;
+    padding:5px 10px;
+    border:solid 1px #EEE;
+    border-radius:2px;
+  }
+  form textarea {
+    height:100px;
+    resize:vertical;
+  }
+    form :disabled {
+      background-color:#F5F5F5;
+    }
+  form a,
+  form p {
+    display:block;
+  }
 /* -- texts -- */
 h1, h2 {
   font-weight:300;
@@ -74,43 +120,76 @@ h2 {
 }
 /* -- colors -- */
 /* -- buttons -- */
-a.btn {
+a.btn,
+button {
   min-width:100px;
   width:auto;
   display:inline-block;
   padding:5px 10px;
+  border:none;
   border-radius:2px;
   text-align:center;
 }
-  a.btn.btn-med {
+a.btn:hover,
+button:hover {
+  cursor:pointer;
+}
+  a.btn.btn-med,
+  button.btn-med {
     padding:10px 15px;
   }
-  a.btn.btn-lrg {
+  a.btn.btn-lrg,
+  button.btm-lrg {
     padding:20px 30px;
   }
-  a.btn.btn-x-lrg {
+  a.btn.btn-x-lrg,
+  button.btn-x-lrg {
     padding:40px 60px;
   }
-    a.btn.btn-default {
+    a.btn.btn-default,
+    button.btn-default {
       background-color:#FFF;
       border:solid 1px #EEE;
     }
-      a.btn.btn-default:hover {
+      a.btn.btn-default:hover,
+      button.btn-default:hover {
         background-color:#F5F5F5;
       }
-    a.btn.btn-success {
+    a.btn.btn-success,
+    button.btn-success {
         background-color:#2ECC71;
         color:#FFF;
     }
-      a.btn.btn-success:hover {
+      a.btn.btn-success:hover,
+      button.btn-success:hover {
         background-color:#27AE60;
       }
-    a.btn.btn-info {
+    a.btn.btn-info,
+    button.btn-info {
         background-color:#3498DB;
         color:#FFF;
     }
-      a.btn.btn-info:hover {
+      a.btn.btn-info:hover,
+      button.btn-info:hover {
         background-color:#2980B9;
+      }
+    a.btn.btn-warning,
+    button.btn-warning {
+        background-color:#E67E22;
+        color:#FFF;
+    }
+      a.btn.btn-warning:hover,
+      button.btn-warning:hover {
+        background-color:#D35400;
+      }
+    a.btn.btn-danger,
+    button.btn-danger {
+        background-color:#E74C3C;
+        color:#FFF;
+    }
+      a.btn.btn-danger:hover,
+      button.btn-danger:hover {
+        background-color:#C0392B;
       }
 /*-- margins -- */
 .clr {

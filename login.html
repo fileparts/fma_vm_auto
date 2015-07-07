@@ -21,15 +21,28 @@
     </ul>
   </div>
   <div class="main wrp">
-    <div class="clr mrg-btm-x-lrg">
-      <h1 class="mrg-btm-med">VM Booking</h1>
-      <p class="mrg-btm-med"><b>How it works:</b> Each VM <i>should</i> have an application running on them that sends data to a server, once the server recieves the information it then will update the MySQL Database. Information such as: Host, Purpose and Usage will be updated by Website Admins when needs be.</p>
-      <p><b>Are the Users connected to the Active Directory?</b> At this moment in time, no.</p>
-    </div>
     <div class="clr">
-      <a class="btn btn-x-lrg btn-success"><i class="fa fa-fw fa-user"></i> Login</a>
-      <a class="btn btn-x-lrg btn-info"><i class="fa fa-fw fa-user-plus"></i> Register</a>
-      <a class="btn btn-x-lrg btn-danger"><i class="fa fa-fw fa-unlock-alt"></i> Logout</a>
+      <h1>Login</h1>
+      <form class="mrg-top-lrg" method="post" action="./action.php?a=login">
+        <table class="fixed">
+          <tr>
+            <td><p>Enter Your Username</p></td>
+            <td><input name="formName" type="text" placeholder="Username" required /></td>
+          </tr>
+          <tr>
+            <td><p>Enter Your Password</p></td>
+            <td><input name="formName" type="text" placeholder="Password" required /></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td><button class="btn-default">Login</button></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td><a class="mrg-top-lrg" href="#">Don't have an Account?</a></td>
+          </tr>
+        </table>
+      </form>
     </div>
   </div>
 </body>
