@@ -69,16 +69,17 @@
       $checkUsername->close();
 
       if($okay == true) {
-        $checkPassword = $con->prepare("SELECT userID,userPass FROM users WHERE userName=?");
+        $checkPassword = $con->prepare("SELECT userID,userPass,userPerms FROM users WHERE userName=?");
         $checkPassword->bind_param("s", $formName);
         $checkPassword->execute();
-        $checkPassword->bind_result($userID,$userPass);
+        $checkPassword->bind_result($userID,$userPass,$userPerms);
         while($checkPassword->fetch()) {
           if($userPass == $formPass) {
   ?>
     <p class="alert">Logging In, redirecting...</p>
   <?php
             $_SESSION['vm_userID'] = $userID;
+            $_SESSION['vm_userPerms'] = $userPerms;
             redirect("./");
           } else {
   ?>

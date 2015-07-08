@@ -20,6 +20,12 @@
       <li><a href="./logout.php"><i class="fa fa-fw fa-unlock-alt"></i> Logout</a></li>
       <?php
     };
+
+    if(isset($_SESSION['vm_userID']) && $_SESSION['vm_userPerms'] > 3) {
+      ?>
+      <li><a href="./admin.php"><i class="fa fa-fw fa-cog"></i> Admin</a></li>
+      <?php
+    };
       ?>
       <li><a href="mailto:dexter.marks-barber@fma.uk.com"><i class="fa fa-fw fa-envelope"></i> Feedback</a></li>
     </ul>

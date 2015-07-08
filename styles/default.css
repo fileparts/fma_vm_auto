@@ -33,6 +33,9 @@ b, i, u {
 b {
   font-weight:500;
 }
+i {
+  font-style:italic;
+}
 .wrp {
   width:940px;
   margin:auto auto;
@@ -268,6 +271,25 @@ button:hover {
       button.btn-danger:hover {
         background-color:#C0392B;
       }
+a.btn-grp {
+  min-width:20px;
+  float:left;
+  border-left:none;
+  border-radius:0;
+}
+  a.btn-grp:hover {
+    background-color:#F5F5F5;
+    color:inherit;
+  }
+a.btn-grp:first-child {
+  border-left:solid 1px #EEE;
+  border-top-left-radius:2px;
+  border-bottom-left-radius:2px;
+}
+a.btn-grp:last-child {
+  border-top-right-radius:2px;
+  border-bottom-right-radius:2px;
+}
 /*-- margins -- */
 .clr {
   display:block;
@@ -339,3 +361,41 @@ button:hover {
 .options {
   text-align:right;
 }
+/* -- calendar -- */
+div.date-controls {
+
+}
+  div.date-controls > * {
+    float:right;
+  }
+table.date-days {
+  border-collapse:collapse;
+}
+  table.date-days tr > * {
+    border:solid 1px #DDD;
+  }
+table.date-calendar {
+  border-collapse:collapse;
+}
+  table.date-calendar tr > * {
+    min-height:130px;
+    max-height:130px;
+    height:130px;
+    vertical-align:top;
+  }
+  table.date-calendar tr > *.date {
+    border:solid 1px #DDD;
+    border-right:none;
+  }
+    table.date-calendar tr:first-child > *.date {
+      border-top:none;
+    }
+    table.date-calendar tr > *.date:last-child {
+      border-right:solid 1px #DDD;
+    }
+  table.date-calendar tr > *.booked {
+    background-color:#E74C3C;
+  }
+    table.date-calendar tr > *.booked > * {
+      color:#FFF;
+    }

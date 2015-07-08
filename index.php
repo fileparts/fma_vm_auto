@@ -8,7 +8,7 @@
   <div class="main wrp">
     <div class="clr mrg-btm-x-lrg">
       <h1 class="mrg-btm-x-lrg">VM Booking</h1>
-      <p class="mrg-btm-med"><b>How it works:</b> Each VM <i>should</i> have an application running on them that sends data to a server, once the server recieves the information it then will update the MySQL Database. Information such as: Host, Purpose and Usage will be updated by Website Admins when needs be.</p>
+      <p class="mrg-btm-med"><b>How it works:</b> Each VM <i>should</i> have an application running that sends machine data back to a server, once the server recieves and formats the information, it then sends a series of MySQL Queries to the VM database which then inturn is displayed on this website.</p>
       <p><b>Are the Users connected to the Active Directory?</b> At this moment in time, no.</p>
     </div>
     <div class="clr">

@@ -1,7 +1,98 @@
 <?php include('./config.php'); ?>
 <html>
 <head>
-<?php include('./head.php'); ?>
+<?php
+  include('./head.php');
+
+  //Labels
+$dayLabels 			= array("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday");
+$dayMiniLabels		= array("Mon","Tue","Wed","Thu","Fri","Sat","Sun");
+$monthLables 		= array("January","February","March","April","May","June","July","August","September","October","November","December");
+
+$forceMonth = $_GET['m'];
+$forceYear = $_GET['y'];
+
+$currentDate			= date("Y-m-d");
+$explodeDate		= explode("-", $currentDate);
+
+//Currents
+if(isset($forceMonth)) {
+  if(strlen($forceMonth) == 1) {
+    $forceMonth 	= sprintf("%02d", $forceMonth);
+  };
+  $currentMonth	= $forceMonth;
+} else {
+  $currentMonth	= date("m");
+};
+
+if(isset($forceYear)) {
+  if(strlen($forceYear) == 2) {
+    $dt 				= DateTime::createFromFormat('y', $forceYear);
+    $forceYear 	= $dt->format('Y');
+  };
+  $currentYear		= $forceYear;
+} else {
+  $currentYear		= date("Y");
+};
+
+//variables
+$monthStart 			= date($currentYear. '-' .$currentMonth. '-01');
+$monthEnd   			= date($currentYear. '-' .$currentMonth. '-t');
+
+$prevMonth 			= sprintf("%02d", $currentMonth - 1);
+$nextMonth 			= sprintf("%02d", $currentMonth + 1);
+$prevYear 			= sprintf("%02d", $currentYear - 1);
+$nextYear 			= sprintf("%02d", $currentYear + 1);
+
+$daysInMonth 		= cal_days_in_month(CAL_GREGORIAN, $currentMonth, $currentYear);
+$firstDayofMonth	= date("D", strtotime("01-$currentMonth-$currentYear"));
+$firstDayofMonth	= array_search($firstDayofMonth, $dayMiniLabels);
+$firstDayofMonth	= $firstDayofMonth;
+
+if($firstDayofMonth == 0) {
+  $firstDayofMonth = 7;
+};
+
+$bookings 			= array();
+$s 						= new DateTime($monthStart);
+$e 						= new DateTime("$monthEnd + 1 days");
+$oneday 				= new DateInterval('P1D');
+$dp 						= new DatePeriod($s, $oneday, $e);
+
+foreach ($dp as $d) {
+  $bookings[$d->format('Y-m-d')] = '';
+};
+
+$sql = "SELECT userID
+     , bookingStart
+     , bookingEnd
+     , projectNumber
+    FROM bookings
+    WHERE machineID = ?
+      AND bookingStart < ?
+      AND bookingEnd > ?";
+$getBookings = $con->prepare($sql);
+$getBookings->bind_param('iss', $_GET['id'], $monthEnd, $monthStart);
+$getBookings->execute();
+$getBookings->bind_result($uid, $bstart, $bend, $projectNumber);
+
+while ($getBookings->fetch()) {
+  $s 					= new DateTime(max($bstart, $monthStart));
+  $e 					= new DateTime(min($bend, $monthEnd));
+  $e->modify('+1 day');
+  $dp = new DatePeriod($s, $oneday, $e);
+  foreach ($dp as $d) {
+    $bookings[$d->format('Y-m-d')]['user'] = $uid;
+    $bookings[$d->format('Y-m-d')]['project'] = $projectNumber;
+  };
+};
+
+//counters
+$dayCount 	= 0;
+$startMonth 	= 0;
+$calDate 		= 0;
+
+?>
 </head>
 <body>
   <?php include('./nav.php'); ?>
@@ -22,10 +113,13 @@
             $getHostDetails->bind_result($hostID,$hostIP,$hostName);
             while($getHostDetails->fetch()) {
 ?>
+<div class="clr">
+  <h1 class="mrg-btm-x-lrg"><?php echo $hostName; ?> / <?php echo $hostIP; ?></h1>
+</div>
 <table class="full outline">
   <tr class="head">
     <td colspan="7">
-      <p><?php echo $hostName; ?> / <?php echo $hostIP; ?></p>
+      <p>Machines</p>
     </td>
   </tr>
 
@@ -169,15 +263,300 @@
           if($getMachine->num_rows > 0) {
             $getMachine->bind_result($machineID,$machineIP,$machineName,$hostID);
             while($getMachine->fetch()) {
+              if($hostID != NULL) {
+                $getHost = $con->prepare("SELECT hostID,hostIP,hostName FROM hosts WHERE hostID=?");
+                $getHost->bind_param("i", $hostID);
+                $getHost->execute();
+                $getHost->store_result();
+                $getHost->bind_result($hostID,$hostIP,$hostName);
+                while($getHost->fetch()) {
+                  $hostID = $hostID;
+                  $hostIP = $hostIP;
+                  $hostName = $hostName;
+                };
+                $getHost->close();
+              };
+
+              $getMachineDetails = $con->prepare("SELECT machineMemory,machineDiskSpace,machineCores,machinePurpose,machineUsage,machineOS FROM machinedetails WHERE machineID=?");
+              $getMachineDetails->bind_param("i", $machineID);
+              $getMachineDetails->execute();
+              $getMachineDetails->store_result();
+              $getMachineDetails->bind_result($machineMemory,$machineDiskSpace,$machineCores,$machinePurpose,$machineUsage,$machineOS);
+              while($getMachineDetails->fetch()) {
+                $machineMemory = $machineMemory;
+                $machineDiskSpace = $machineDiskSpace;
+                $machineCores = $machineCores;
+                $machinePurpose = $machinePurpose;
+                $machineUsage = $machineUsage;
+                $machineOS = $machineOS;
+              };
+              $getMachineDetails->close();
+
+              if($machineOS != NULL) {
+                $getMachineOS = $con->prepare("SELECT machineosName FROM machineos WHERE machineosID=?");
+                $getMachineOS->bind_param("i", $machineOS);
+                $getMachineOS->execute();
+                $getMachineOS->store_result();
+                $getMachineOS->bind_result($machineosName);
+                while($getMachineOS->fetch()) {
+                  $machineosName = $machineosName;
+                };
+                $getMachineOS->close();
+              };
+
+              if($machinePurpose != NULL) {
+                $getMachinePurpose = $con->prepare("SELECT machinePurposeName FROM machinePurposes WHERE machinePurposeID=?");
+                $getMachinePurpose->bind_param("i", $machinePurpose);
+                $getMachinePurpose->execute();
+                $getMachinePurpose->store_result();
+                $getMachinePurpose->bind_result($machinePurposeName);
+                while($getMachinePurpose->fetch()) {
+                  $machinePurposeName = $machinePurposeName;
+                };
+                $getMachinePurpose->close();
+              };
+
+              if($machineUsage != NULL) {
+                $getMachineUsage = $con->prepare("SELECT machineUsageName FROM machineUsages WHERE machineUsageID=?");
+                $getMachineUsage->bind_param("i", $machineUsage);
+                $getMachineUsage->execute();
+                $getMachineUsage->store_result();
+                $getMachineUsage->bind_result($machineUsageName);
+                while($getMachineUsage->fetch()) {
+                  $machineUsageName = $machineUsageName;
+                };
+                $getMachineUsage->close();
+              };
 ?>
-<div class="clr">
+<div class="clr mrg-btm-x-lrg">
   <h1><?php echo $machineName; ?> / <?php echo $machineIP; ?></h1>
 </div>
-<div class="clr">
+<div class="clr mrg-btm-x-lrg">
+  <table class="fixed full outline">
+    <tr class="head">
+      <td colspan="6"><p>Machine Details</p></td>
+    </tr>
+    <tr>
+      <td><p><b>Host IP</b></p></td>
+      <td>
+<?php
+              if($hostID != NULL) {
+?>
+        <a href="./view.php?t=h&id=<?php echo $hostID; ?>"><?php echo $hostIP; ?></a>
+<?php
+              } else {
+?>
+        <p class="danger">Undefined</p>
+<?php
+              };
+?>
+      </td>
 
+      <td><p><b>Machine OS</b></p></td>
+      <td>
+<?php
+              if($machineosName != NULL) {
+?>
+        <p><?php echo $machineosName; ?></p>
+<?php
+              } else {
+?>
+        <p class="danger">Undefined</p>
+<?php
+              };
+?>
+      </td>
+
+      <td><p><b>Machine Memory</b></p></td>
+      <td><p><?php echo $machineMemory; ?> MB</p></td>
+    </tr>
+    <tr>
+      <td><p><b>Machine IP</b></p></td>
+      <td><p><?php echo $machineIP; ?></p></td>
+
+      <td><p><b>Machine Purpose</b></p></td>
+      <td>
+<?php
+              if($machinePurposeName != NULL) {
+?>
+        <p><?php echo $machinePurposeName; ?></p>
+<?php
+              } else {
+?>
+        <p class="danger">Undefined</p>
+<?php
+              };
+?>
+      </td>
+
+      <td><p><b>Machine Disk Space</b></p></td>
+      <td><p><?php echo $machineDiskSpace; ?> GB</p></td>
+    </tr>
+    <tr>
+      <td><p><b>Machine Name</b></p></td>
+      <td><p><?php echo $machineName; ?></p></td>
+
+      <td><p><b>Machine Usage</b></p></td>
+      <td>
+<?php
+              if($machineUsageName != NULL) {
+?>
+        <p><?php echo $machineUsageName; ?></p>
+<?php
+              } else {
+?>
+        <p class="danger">Undefined</p>
+<?php
+              };
+?>
+      </td>
+
+      <td><p><b>Machine Cores</b></p></td>
+      <td><p><?php echo $machineCores; ?></p></td>
+    </tr>
+  </table>
 </div>
 <?php
             };
+?>
+<div id="date" class="date-controls clr">
+  <table class="mrg-btm-med">
+    <tr>
+      <td><p class="month"><?php echo $monthLables[$currentMonth - 1]; ?></p></td>
+      <td><p><?php echo $currentMonth. '-' .$currentYear ?></p></td>
+      <td>
+        <a class="btn btn-grp fa fa-angle-double-left" href="./view.php?t=m&id=<?php echo $machineID; ?>&m=<?php echo $currentMonth; ?>&y=<?php echo $prevYear; ?>#date" title="Prev Year"></a>
+        <a class="btn btn-grp fa fa-angle-left"
+        <?php
+          if($prevMonth == 0) {
+            echo 'href="./view.php?t=m&id=' .$machineID. '&m=12&y=' .$prevYear. '#date" ';
+          } else {
+            echo 'href="./view.php?t=m&id=' .$machineID. '&m=' .$prevMonth. '&y=' .$currentYear. '#date" ';
+          };
+        ?>
+        title="Prev Month"></a>
+        <a class="btn btn-grp fa fa-home" href="./view.php?t=m&id=<?php echo $machineID; ?>&m=<?php echo $explodeDate[1]; ?>&y=<?php echo $explodeDate[0]; ?>#date" title="Current Date"></a>
+        <a class="btn btn-grp fa fa-angle-right"
+        <?php
+          if($nextMonth == 13) {
+            echo 'href="./view.php?t=m&id=' .$machineID. '&m=01&y=' .$nextYear. '#date" ';
+          } else {
+            echo 'href="./view.php?t=m&id=' .$machineID. '&m=' .$nextMonth. '&y=' .$currentYear. '#date" ';
+          };
+        ?>
+        title="Next Month"></a>
+        <a class="btn btn-grp fa fa-angle-double-right" href="./view.php?t=m&id=<?php echo $machineID; ?>&m=<?php echo $currentMonth; ?>&y=<?php echo $nextYear; ?>#date" title="Next Year"></a>
+      </td>
+    </tr>
+  </table>
+</div>
+<table class="date-days fixed full">
+  <tr class="head">
+  <?php
+    foreach($dayLabels as $day) {
+      echo '<td class="day"><p>' .$day. '</p></td>';
+    };
+  ?>
+  </tr>
+</table>
+<table id="calendar" class="date-calendar fixed full">
+  <?php
+    foreach($bookings as $key=>$date) {
+      $dayCount++;
+      $calDate++;
+      $calDate = sprintf("%02d", $calDate);
+
+      if($dayCount == 1) {
+        echo '<tr>';
+      };
+
+      if($firstDayofMonth != 7) {
+        while($startMonth < $firstDayofMonth) {
+          echo '<td></td>';
+          $startMonth++;
+          $dayCount++;
+          $temp_dayCount = sprintf("%02d", $dayCount);
+          $dayCount = $temp_dayCount;
+        };
+      };
+
+      if($date != "") {
+        if($getUserName = $con->prepare("SELECT userFirst,userLast,userEmail FROM users WHERE userID=?")) {
+          $getUserName->bind_param("i", $date['user']);
+          $getUserName->execute();
+          $getUserName->bind_result($userFirst,$userLast,$userEmail);
+          while($getUserName->fetch()) {
+            echo '
+              <td class="date booked">
+                <p>' .$calDate. '</p><br>
+                <p>' .$userFirst. ' ' .$userLast. '</p>
+              </td>
+            ';
+          };
+        };
+        $getUserName->close();
+      } else {
+        echo '
+          <td class="date">
+            <p>' .$calDate. '</p>
+        ';
+
+        echo '
+          </td>
+        ';
+      };
+
+      if($dayCount == 7) {
+        echo '</tr>';
+        $dayCount = 0;
+      };
+    };
+  ?>
+</table>
+<div class="clr mrg-top-x-lrg">
+  <table class="fixed full outline">
+    <tr class="head">
+      <td colspa="4"><p>Bookings</p></td>
+    </tr>
+<?php
+  $getBookings = $con->prepare("SELECT userID,bookingStart,bookingEnd FROM bookings WHERE machineID=?");
+  $getBookings->bind_param("i", $machineID);
+  $getBookings->execute();
+  $getBookings->store_result();
+  if($getBookings->num_rows > 0) {
+    $getBookings->bind_result($userID,$bookingStart,$bookingEnd);
+    while($getBookings->fetch()) {
+      $getUserDetails = $con->prepare("SELECT userFirst,userLast,userEmail FROM users WHERE userID=?");
+      $getUserDetails->bind_param("i", $userID);
+      $getUserDetails->execute();
+      $getUserDetails->store_result();
+      $getUserDetails->bind_result($userFirst,$userLast,$userEmail);
+      while($getUserDetails->fetch()) {
+?>
+    <tr>
+      <td><p><?php echo $userFirst. ' ' .$userLast; ?></p></td>
+      <td><a class="mailto:<?php echo $userEmail; ?>"><?php echo $userEmail; ?></a></td>
+      <td><p><?php echo $bookingStart; ?> => <?php echo $bookingEnd; ?></p></td>
+      <td class="options">
+
+      </td>
+    </tr>
+<?php
+      };
+      $getUserDetails->close();
+    };
+  } else {
+?>
+    <tr>
+      <td><p class="alert">No Bookings Found</p></td>
+    </tr>
+<?php
+  };
+  $getBookings->close();
+?>
+  </table>
+</div>
+<?php
           } else {
 ?>
     <p class="alert">invalid machine id, redirecting...</p>
