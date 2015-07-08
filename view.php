@@ -520,6 +520,9 @@ $calDate 		= 0;
 ?>
 <td class="date">
   <p><?php echo $calDate; ?></p>
+<?php
+  if($_SESSION['vm_userPerms'] > 0) {
+?>
   <a class="date-bookNow"></a>
   <form class="date-book" method="post" action="./action.php?a=book">
     <input name="userID" type="hidden" value="<?php echo $_SESSION['vm_userID']; ?>" required />
@@ -552,10 +555,13 @@ $calDate 		= 0;
       </tr>
       <tr>
         <td></td>
-        <td><p class="subtitle">Make sure dates are dd-mm-yyy!</p>
+        <td><p class="subtitle">Make sure dates are dd-mm-yyyy!</p>
       </tr>
     </table>
   </form>
+<?php
+  };
+?>
 </td>
 <?php
       };

@@ -19,6 +19,11 @@ if(!isset($_SESSION['vm_userID'])) {
       <a class="btn btn-med btn-info" href="./register.php"><i class="fa fa-fw fa-user-plus"></i> Register</a>
 <?php
 } else {
+  if($_SESSION['vm_userPerms'] > 3) {
+?>
+      <a class="btn btn-med btn-warning" href="./admin.php"><i class="fa fa-fw fa-cog"></i> Admin</a>
+<?php
+  };
 ?>
       <a class="btn btn-med btn-danger" href="./logout.php"><i class="fa fa-fw fa-unlock-alt"></i> Logout</a>
 <?php

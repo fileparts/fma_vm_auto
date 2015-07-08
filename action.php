@@ -97,13 +97,16 @@
 
 			if(strlen($bookingStartDate) == 10) {
 				if(strpos($bookingStartDate, '-') !== FALSE) {
-					$okay					= true;
 					$temp_start			= explode('-', $bookingStartDate);
 					$bookingStartDate	= $temp_start[2]. '-' .$temp_start[1]. '-' .$temp_start[0];
 				} else {
+					echo "<p class='alert'>Date Conversion Error, Redirecting...</p>";
+					redirect("./view.php?t=m&id=$machineID");
 					$okay 					= false;
 				};
 			} else {
+        echo "<p class='alert'>Date Conversion Error, Redirecting...</p>";
+        redirect("./view.php?t=m&id=$machineID");
 				$okay 						= false;
 			};
 
@@ -111,13 +114,16 @@
 
 			if(strlen($bookingEndDate) == 10) {
 				if(strpos($bookingEndDate, '-') !== FALSE) {
-					$okay					= true;
 					$temp_end			= explode('-', $bookingEndDate);
 					$bookingEndDate	= $temp_end[2]. '-' .$temp_end[1]. '-' .$temp_end[0];
 				} else {
+					echo "<p class='alert'>Date Conversion Error, Redirecting...</p>";
+					redirect("./view.php?t=m&id=$machineID");
 					$okay 					= false;
 				};
 			} else {
+        echo "<p class='alert'>Date Conversion Error, Redirecting...</p>";
+        redirect("./view.php?t=m&id=$machineID");
 				$okay 						= false;
 			};
 
@@ -172,9 +178,6 @@
 							};
 						};
 						$createBooking->close();
-					} else {
-						echo "<p class='alert'>Date Conversion Error, Redirecting...</p>";
-						redirect("./view.php?t=m&id=$machineID");
 					};
 				} else {
 					echo "<p class='alert'>Execution Error: Check Dates, Redirecting...</p>";
