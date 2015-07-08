@@ -8,7 +8,7 @@ html, body {
   font-family:'Roboto', sans-serif;
   color:#777;
 }
-p,
+p, div,
 form, input, select, textarea, button,
 ul, li,
 table, tr, th, td {
