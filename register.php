@@ -53,9 +53,9 @@ $(document).ready(function() {
   <?php include('./nav.php'); ?>
   <div class="main wrp">
     <div class="clr">
-    <?php
+      <?php
     if(!isset($_SESSION['vm_userID'])) {
-    ?>
+      ?>
       <h1>Register</h1>
       <form class="mrg-top-lrg" method="post" action="./action.php?a=register">
         <table class="fixed">
@@ -93,9 +93,14 @@ $(document).ready(function() {
           </tr>
         </table>
       </form>
-    <?php
+      <?php
+    } else {
+      ?>
+      <p class="alert">You are already logged in, redirecting...</p>
+      <?php
+      redirect("./");
     };
-    ?>
+      ?>
     </div>
   </div>
 </body>

@@ -1,3 +1,4 @@
+<?php include('./config.php'); ?>
 <html>
 <head>
 <?php include('./head.php'); ?>
@@ -53,14 +54,14 @@ $(document).ready(function() {
   <div class="main wrp">
     <div class="clr">
     <?php
-    if(!isset($_SESSION['vm_userID'])) {
+  if(!isset($_SESSION['vm_userID'])) {
     ?>
       <h1>Login</h1>
       <form class="mrg-top-lrg" method="post" action="./action.php?a=login">
         <table class="fixed">
           <tr>
             <td><p>Enter Your Username</p></td>
-            <td><input name="formName" type="text" placeholder="Username" autocomplete="off" required /></td>
+            <td><input name="formName" type="text" placeholder="Username" autocomplete="off" autofocus required /></td>
           </tr>
           <tr>
             <td><p>Enter Your Password</p></td>
@@ -77,7 +78,12 @@ $(document).ready(function() {
         </table>
       </form>
     <?php
-    };
+  } else {
+    ?>
+    <p class="alert">You are already logged in, redirecting...</p>
+    <?php
+    redirect("./");
+  };
     ?>
     </div>
   </div>
