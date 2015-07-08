@@ -90,6 +90,97 @@
         };
         $checkPassword->close();
       };
+    } else if($action == "book") {
+      $userID 						= $_POST['userID'];
+			$machineID 					= $_POST['machineID'];
+			$bookingStartDate 		= $_POST['formStart'];
+
+			if(strlen($bookingStartDate) == 10) {
+				if(strpos($bookingStartDate, '-') !== FALSE) {
+					$okay					= true;
+					$temp_start			= explode('-', $bookingStartDate);
+					$bookingStartDate	= $temp_start[2]. '-' .$temp_start[1]. '-' .$temp_start[0];
+				} else {
+					$okay 					= false;
+				};
+			} else {
+				$okay 						= false;
+			};
+
+			$bookingEndDate 			= $_POST['formEnd'];
+
+			if(strlen($bookingEndDate) == 10) {
+				if(strpos($bookingEndDate, '-') !== FALSE) {
+					$okay					= true;
+					$temp_end			= explode('-', $bookingEndDate);
+					$bookingEndDate	= $temp_end[2]. '-' .$temp_end[1]. '-' .$temp_end[0];
+				} else {
+					$okay 					= false;
+				};
+			} else {
+				$okay 						= false;
+			};
+
+			$temp_bookingStart 		= strtotime($bookingStartDate);
+			$temp_bookingEnd			= strtotime($bookingEndDate);
+
+			if($checkDates = $con->prepare("SELECT bookingStart,bookingEnd FROM bookings WHERE machineID=?")) {
+				$checkDates->bind_param("i", $machineID);
+				if($checkDates->execute()) {
+					$checkDates->store_result();
+					if($checkDates->num_rows > 0) {
+						$checkDates->bind_result($bookingStart,$bookingEnd);
+						while($checkDates->fetch()) {
+							$bookingStart 	= strtotime($bookingStart);
+							$bookingEnd 		= strtotime($bookingEnd);
+
+							if(($bookingStart >= $temp_bookingStart) && ($bookingStart <= $temp_bookingEnd)) {
+								echo "<p class='alert'>Date is Taken, Redirecting...</p>";
+								redirect("./view.php?t=m&id=$machineID");
+							} else {
+								if(($bookingEnd >= $temp_bookingStart)  && ($bookingEnd <= $temp_bookingEnd)) {
+									echo "<p class='alert'>Date is Taken, Redirecting...</p>";
+									redirect("./view.php?t=m&id=$machineID");
+								} else {
+									if(($temp_bookingStart >= $bookingStart) && ($temp_bookingStart <= $bookingEnd)) {
+										echo "<p class='alert'>Date is Taken, Redirecting...</p>";
+										redirect("./view.php?t=m&id=$machineID");
+									} else {
+										if(($temp_bookingEnd >= $bookingStart)  && ($temp_bookingEnd <= $bookingEnd)) {
+											echo "<p class='alert'>Date is Taken, Redirecting...</p>";
+											redirect("./view.php?t=m&id=$machineID");
+										} else {
+											$okay = true;
+										};
+									};
+								};
+							};
+						};
+					} else {
+						$okay = true;
+					};
+
+					if($okay == true) {
+						if($createBooking = $con->prepare("INSERT INTO bookings(userID,machineID,bookingStart,bookingEnd) VALUES(?,?,?,?)")) {
+							$createBooking->bind_param("iiss", $userID,$machineID,$bookingStartDate,$bookingEndDate);
+							if($createBooking->execute()) {
+								echo '<p class="alert">Booking Successfully Created, Redirecting...</p>';
+								redirect("./view.php?t=m&id=$machineID");
+							} else {
+								echo '<p class="alert">Execution Error: Booking Creation, Redirecting...</p>';
+								redirect("./view.php?t=vmm&id=$machineID");
+							};
+						};
+						$createBooking->close();
+					} else {
+						echo "<p class='alert'>Date Conversion Error, Redirecting...</p>";
+						redirect("./view.php?t=m&id=$machineID");
+					};
+				} else {
+					echo "<p class='alert'>Execution Error: Check Dates, Redirecting...</p>";
+				};
+			};
+			$checkDates->close();
     } else {
   ?>
     <p class="alert">A Valid Action is Required...</p>

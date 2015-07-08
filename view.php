@@ -69,8 +69,8 @@ $sql = "SELECT userID
      , projectNumber
     FROM bookings
     WHERE machineID = ?
-      AND bookingStart < ?
-      AND bookingEnd > ?";
+      AND bookingStart <= ?
+      AND bookingEnd >= ?";
 $getBookings = $con->prepare($sql);
 $getBookings->bind_param('iss', $_GET['id'], $monthEnd, $monthStart);
 $getBookings->execute();
@@ -93,6 +93,20 @@ $startMonth 	= 0;
 $calDate 		= 0;
 
 ?>
+<script>
+  $(document).ready(function() {
+    var toggler = $('a.date-bookNow');
+    var innerToggle = $('form a.date-closeNow');
+
+    toggler.on('click', function() {
+      $(this).siblings('form').toggle();
+    });
+
+    innerToggle.on('click', function() {
+      $(this).parent().parent().toggle();
+    });
+  });
+</script>
 </head>
 <body>
   <?php include('./nav.php'); ?>
@@ -479,7 +493,13 @@ $calDate 		= 0;
           $dayCount = $temp_dayCount;
         };
       };
-
+?>
+  <script>
+    $(document).ready(function() {
+      console.log("<?php echo $key; ?> : <?php echo $date; ?>");
+    });
+  </script>
+<?php
       if($date != "") {
         if($getUserName = $con->prepare("SELECT userFirst,userLast,userEmail FROM users WHERE userID=?")) {
           $getUserName->bind_param("i", $date['user']);
@@ -488,22 +508,56 @@ $calDate 		= 0;
           while($getUserName->fetch()) {
             echo '
               <td class="date booked">
-                <p>' .$calDate. '</p><br>
-                <p>' .$userFirst. ' ' .$userLast. '</p>
+                <p>' .$calDate. '</p>
+                <p class="mrg-top">' .$userFirst. ' ' .$userLast. '</p>
+                <p class="mrg-top">' .$userEmail. '</p>
               </td>
             ';
           };
         };
         $getUserName->close();
       } else {
-        echo '
-          <td class="date">
-            <p>' .$calDate. '</p>
-        ';
+?>
+<td class="date">
+  <p><?php echo $calDate; ?></p>
+  <a class="date-bookNow"></a>
+  <form class="date-book" method="post" action="./action.php?a=book">
+    <input name="userID" type="hidden" value="<?php echo $_SESSION['vm_userID']; ?>" required />
+    <input name="machineID" type="hidden" value="<?php echo $machineID; ?>" required />
 
-        echo '
-          </td>
-        ';
+    <div class="clr mrg-btm-med options">
+      <a class="date-closeNow"><i class="fa fa-fw fa-close"></i></a>
+    </div>
+    <table class="full">
+      <tr>
+        <td colspan="2">
+          <h2>Book Dates</h2>
+        </td>
+      </tr>
+      <tr>
+        <td><p>Start Date</p></td>
+        <td>
+          <input name="formStart" type="text" value="<?php echo $calDate. '-' .$currentMonth. '-' .$currentYear; ?>" required />
+        </td>
+      </tr>
+      <tr>
+        <td><p>End Date</p></td>
+        <td>
+          <input name="formEnd" type="text" value="<?php echo $calDate. '-' .$currentMonth. '-' .$currentYear; ?>" required />
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><button class="confirm btn-default">Submit</button></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><p class="subtitle">Make sure dates are dd-mm-yyy!</p>
+      </tr>
+    </table>
+  </form>
+</td>
+<?php
       };
 
       if($dayCount == 7) {
@@ -514,9 +568,9 @@ $calDate 		= 0;
   ?>
 </table>
 <div class="clr mrg-top-x-lrg">
-  <table class="fixed full outline">
+  <table class="full outline">
     <tr class="head">
-      <td colspa="4"><p>Bookings</p></td>
+      <td colspan="4"><p>Bookings</p></td>
     </tr>
 <?php
   $getBookings = $con->prepare("SELECT userID,bookingStart,bookingEnd FROM bookings WHERE machineID=?");
@@ -537,7 +591,7 @@ $calDate 		= 0;
       <td><p><?php echo $userFirst. ' ' .$userLast; ?></p></td>
       <td><a class="mailto:<?php echo $userEmail; ?>"><?php echo $userEmail; ?></a></td>
       <td><p><?php echo $bookingStart; ?> => <?php echo $bookingEnd; ?></p></td>
-      <td class="options">
+      <td class="fixed-100 options">
 
       </td>
     </tr>
