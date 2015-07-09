@@ -7,5 +7,5 @@
 		exit();
 	};
 
-	$cryptSalt = '---';
+	$cryptSalt = '$2y$06$PizWslhw9Z9oM9QSPt9zY.g9faOSoUdNLO7RemQrWTMY.NOpr3oTG';
 ?>

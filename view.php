@@ -504,7 +504,7 @@ $calDate 		= 0;
               <td class="date booked">
                 <p>' .$calDate. '</p>
                 <p class="mrg-top">' .$userFirst. ' ' .$userLast. '</p>
-                <p class="mrg-top">' .$userEmail. '</p>
+                <a class="mrg-top" href="mailto:' .$userEmail. '">' .$userEmail. '</p>
               </td>
             ';
           };
@@ -573,12 +573,12 @@ $calDate 		= 0;
       <td colspan="4"><p>Bookings</p></td>
     </tr>
 <?php
-  $getBookings = $con->prepare("SELECT userID,bookingStart,bookingEnd FROM bookings WHERE machineID=?");
+  $getBookings = $con->prepare("SELECT bookingID,userID,bookingStart,bookingEnd FROM bookings WHERE machineID=?");
   $getBookings->bind_param("i", $machineID);
   $getBookings->execute();
   $getBookings->store_result();
   if($getBookings->num_rows > 0) {
-    $getBookings->bind_result($userID,$bookingStart,$bookingEnd);
+    $getBookings->bind_result($bookingID,$userID,$bookingStart,$bookingEnd);
     while($getBookings->fetch()) {
       $getUserDetails = $con->prepare("SELECT userFirst,userLast,userEmail FROM users WHERE userID=?");
       $getUserDetails->bind_param("i", $userID);
@@ -590,9 +590,20 @@ $calDate 		= 0;
     <tr>
       <td><p><?php echo $userFirst. ' ' .$userLast; ?></p></td>
       <td><a class="mailto:<?php echo $userEmail; ?>"><?php echo $userEmail; ?></a></td>
-      <td><p><?php echo $bookingStart; ?> => <?php echo $bookingEnd; ?></p></td>
+      <td><p><?php echo $bookingStart; ?> <i class="fa fa-fw fa-angle-double-right"></i> <?php echo $bookingEnd; ?></p></td>
       <td class="fixed-100 options">
-
+<?php
+      if($_SESSION['vm_userPerms'] > 0) {
+?>
+        <a href="mailto:<?php echo $userEmail; ?>"><i class="fa fa-fw fa-bullhorn"></i></a>
+<?php
+      };
+      if($_SESSION['vm_userPerms'] > 3) {
+?>
+        <a class="confirm" href="./action.php?a=deletebooking&id=<?php echo $bookingID; ?>"><i class="fa fa-fw fa-close"></i></a>
+<?php
+      };
+?>
       </td>
     </tr>
 <?php

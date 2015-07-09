@@ -537,6 +537,52 @@
 <?php
         redirect("./");
       };
+    } else if($action == "deletebooking") {
+      if($_SESSION['vm_userPerms'] > 3) {
+        if(isset($_GET['id'])) {
+          $bookingID = $_GET['id'];
+
+          $checkID = $con->prepare("SELECT bookingID FROM bookings WHERE bookingID=?");
+          $checkID->bind_param("i", $bookingID);
+          $checkID->execute();
+          $checkID->store_result();
+          if($checkID->num_rows > 0) {
+            $checkID->bind_result($bookingID);
+            while($checkID->fetch()) {
+              $deleteBooking = $con->prepare("DELETE FROM bookings WHERE bookingID=?");
+              $deleteBooking->bind_param("i", $bookingID);
+              if($deleteBooking->execute()) {
+?>
+    <p class="alert">Booking successfully deleted, redirecting...</p>
+<?php
+                redirect("./browse.php");
+              } else {
+?>
+    <p class="alert">Booking unsuccessfully deleted, redirecting...</p>
+<?php
+                redirect("./browse.php");
+              };
+              $deleteBooking->close();
+            };
+          } else {
+?>
+    <p class="alert">invalid booking id, redirecting...</p>
+<?php
+            redirect("./browse.php");
+          };
+          $checkID->close();
+        } else {
+?>
+    <p class="alert">a booking id is required, redirecting...</p>
+<?php
+          redirec("./browse.php");
+        };
+      } else {
+?>
+    <p class="alert">you do not have permission to view this page, redirecting...</p>
+<?php
+        redirec("./browse.php");
+      };
     } else {
   ?>
     <p class="alert">A Valid Action is Required...</p>
