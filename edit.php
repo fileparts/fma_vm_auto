@@ -93,13 +93,14 @@
           $checkID->execute();
           $checkID->store_result();
           if($checkID->num_rows > 0) {
-            $getMachine = $con->prepare("SELECT machineID,machineIP,machineName,machinePerms FROM machines WHERE machineID=?");
+            $getMachine = $con->prepare("SELECT machineID,machineIP,machineName,hostID,machinePerms FROM machines WHERE machineID=?");
             $getMachine->bind_param("i", $editID);
             $getMachine->execute();
             $getMachine->store_result();
-            $getMachine->bind_result($machineID,$machineIP,$machineName,$machinePerms);
+            $getMachine->bind_result($machineID,$machineIP,$machineName,$machineHostID,$machinePerms);
             while($getMachine->fetch()) {
               $machineID = $machineID;
+              $machineHostID = $machineHostID;
               $machinePerms = $machinePerms;
             };
             $getMachine->close();
@@ -120,6 +121,40 @@
       <input name="editType" type="hidden" value="<?php echo $editType; ?>" required />
       <h1 class="mrg-btm-x-lrg">Edit <?php echo $machineName; ?> / <?php echo $machineIP; ?></h1>
       <table class="fixed">
+        <tr>
+          <td><p>Edit Machine Host</p></td>
+          <td>
+            <select name="formHost" required />
+<?php
+            if($machineHostID == NULL) {
+?>
+            <option selected disabled>Select a Host</option>
+<?php
+            } else {
+?>
+            <option disabled>Select a Host</option>
+<?php
+            };
+            $getHosts = $con->prepare("SELECT hostID,hostIP,hostName FROM hosts WHERE hostPerms=1");
+            $getHosts->execute();
+            $getHosts->store_result();
+            $getHosts->bind_result($hostID,$hostIP,$hostName);
+            while($getHosts->fetch()) {
+              if($hostID == $machinePurposeID) {
+?>
+              <option value="<?php echo $hostID; ?>" selected><?php echo $hostName; ?> / <?php echo $hostIP; ?></option>
+<?php
+              } else {
+?>
+              <option value="<?php echo $hostID; ?>"><?php echo $hostName; ?> / <?php echo $hostIP; ?></option>
+<?php
+              };
+            };
+            $getHosts->close();
+?>
+            </select>
+          </td>
+        </tr>
         <tr>
           <td><p>Edit Machine Purpose</p></td>
           <td>

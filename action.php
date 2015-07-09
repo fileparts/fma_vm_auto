@@ -195,6 +195,7 @@
         $formID = $_POST['formID'];
         $formIP = $_POST['formIP'];
         $formName = $_POST['formName'];
+        $formHost = $_POST['formHost'];
         $formPurpose = $_POST['formPurpose'];
         $formUsage = $_POST['formUsage'];
         $formPerms = $_POST['formPerms'];
@@ -236,8 +237,8 @@
           $checkID->execute();
           $checkID->store_result();
           if($checkID->num_rows > 0) {
-            $editMachine = $con->prepare("UPDATE machines SET machinePerms=? WHERE machineID=?");
-            $editMachine->bind_param("ii", $formPerms,$formID);
+            $editMachine = $con->prepare("UPDATE machines SET hostID=?,machinePerms=? WHERE machineID=?");
+            $editMachine->bind_param("iii", $formHost,$formPerms,$formID);
             if($editMachine->execute()) {
               $editMachine->store_result();
               $editMachineDetails = $con->prepare("UPDATE machinedetails SET machinePurpose=?,machineUsage=? WHERE machineID=?");
