@@ -109,46 +109,46 @@
   ?>
         </td>
         <td>
-  <?php
+<?php
               if($machinePurposeID != NULL) {
-                $getMachinePurposeName = $con->prepare("SELECT machinePurposeName FROM machinePurposes WHERE machinePurposeID=?");
+                $getMachinePurposeName = $con->prepare("SELECT machinePurpose FROM machinePurposes WHERE purposeID=?");
                 $getMachinePurposeName->bind_param("i", $machinePurposeID);
                 $getMachinePurposeName->execute();
                 $getMachinePurposeName->store_result();
                 $getMachinePurposeName->bind_result($machinePurposeName);
                 while($getMachinePurposeName->fetch()) {
-  ?>
+?>
           <p><?php echo $machinePurposeName; ?></p>
-  <?php
+<?php
                 };
                 $getMachinePurposeName->close();
               } else {
-  ?>
+?>
           <p class="danger">Undefined</p>
-  <?php
+<?php
               };
-  ?>
+?>
         </td>
         <td>
-  <?php
+<?php
               if($machineUsageID != NULL) {
-                $getMachineUsageName = $con->prepare("SELECT machineUsageName FROM machineUsages WHERE machineUsageID=?");
+                $getMachineUsageName = $con->prepare("SELECT machineUsage FROM machineUsages WHERE usageID=?");
                 $getMachineUsageName->bind_param("i", $machineUsageID);
                 $getMachineUsageName->execute();
                 $getMachineUsageName->store_result();
                 $getMachineUsageName->bind_result($machineUsageName);
                 while($getMachineUsageName->fetch()) {
-    ?>
+  ?>
           <p><?php echo $machineUsageName; ?></p>
-    <?php
+  <?php
                 };
                 $getMachineUsageName->close();
               } else {
-  ?>
+?>
           <p class="danger">Undefined</p>
-  <?php
+<?php
               };
-  ?>
+?>
         </td>
   <?php
             };

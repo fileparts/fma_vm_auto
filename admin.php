@@ -12,15 +12,28 @@
     <div class="clr mrg-btm-x-lrg">
       <h1>Admin Control Panel</h1>
     </div>
-    <div class="clr options mrg-btm">
-      <p style="display:inline-block;"><i class="fa fa-fw fa-eye"></i> View:</p>
-      <a href="./admin.php?v=h">Hosts</a>
-      <p style="display:inline-block;">,</p>
-      <a href="./admin.php?v=m">Machines</a>
-      <p style="display:inline-block;">,</p>
-      <a href="./admin.php?v=u">Users</a>
-      <p style="display:inline-block;">,</p>
-      <a href="./admin.php">Default</a>
+    <div class="admin-controls clr mrg-btm">
+      <table>
+        <tr>
+          <td>
+            <p>Create: </p>
+          </td>
+          <td>
+            <a class="btn btn-grp" href="./create.php?t=h">Host</a>
+            <a class="btn btn-grp" href="./create.php?t=us">Usage</a>
+            <a class="btn btn-grp" href="./register.php">User</a>
+          </td>
+          <td>
+            <p>View: </p>
+          </td>
+          <td>
+            <a class="btn btn-grp" href="./admin.php?v=h">Hosts</a>
+            <a class="btn btn-grp" href="./admin.php?v=m">Machines</a>
+            <a class="btn btn-grp" href="./admin.php?v=u">Users</a>
+            <a class="btn btn-grp" href="./admin.php">Default</a>
+          </td>
+        </tr>
+      </table>
     </div>
 <?php
   if(!isset($_GET['v']) || $_GET['v'] == "h") {
@@ -131,7 +144,7 @@ $listHosts->close();
         <td>
 <?php
               if($machinePurposeID != NULL) {
-                $getMachinePurposeName = $con->prepare("SELECT machinePurposeName FROM machinePurposes WHERE machinePurposeID=?");
+                $getMachinePurposeName = $con->prepare("SELECT machinePurpose FROM machinePurposes WHERE purposeID=?");
                 $getMachinePurposeName->bind_param("i", $machinePurposeID);
                 $getMachinePurposeName->execute();
                 $getMachinePurposeName->store_result();
@@ -152,7 +165,7 @@ $listHosts->close();
         <td>
 <?php
               if($machineUsageID != NULL) {
-                $getMachineUsageName = $con->prepare("SELECT machineUsageName FROM machineUsages WHERE machineUsageID=?");
+                $getMachineUsageName = $con->prepare("SELECT machineUsage FROM machineUsages WHERE usageID=?");
                 $getMachineUsageName->bind_param("i", $machineUsageID);
                 $getMachineUsageName->execute();
                 $getMachineUsageName->store_result();
@@ -200,11 +213,11 @@ $listHosts->close();
         </td>
       </tr>
 <?php
-        $getUsers = $con->prepare("SELECT userID,userName,userFirst,userLast,userEmail FROM users");
+        $getUsers = $con->prepare("SELECT userID,userName,userFirst,userLast,userEmail,userPerms FROM users");
         $getUsers->execute();
         $getUsers->store_result();
         if($getUsers->num_rows > 0) {
-          $getUsers->bind_result($userID,$userName,$userFirst,$userLast,$userEmail);
+          $getUsers->bind_result($userID,$userName,$userFirst,$userLast,$userEmail,$userPerms);
           while($getUsers->fetch()) {
 ?>
       <tr>
@@ -212,7 +225,29 @@ $listHosts->close();
         <td><p><?php echo $userFirst. ' ' .$userLast; ?></p></td>
         <td><a href="mailto:<?php echo $userEmail; ?>"><?php echo $userEmail; ?></a></td>
         <td class="fixed-100 options">
+<?php
+            if($userPerms != 5) {
+?>
           <a href="./edit.php?t=u&id=<?php echo $userID; ?>"><i class="fa fa-fw fa-wrench"></i></a>
+<?php
+              if($userPerms == 4) {
+?>
+          <a href="./action.php?a=demote&id=<?php echo $userID; ?>"><i class="fa fa-fw fa-angle-double-down"></i></a>
+<?php
+              };
+              if($userPerms < 4 && $userPerms > 0) {
+?>
+          <a href="./action.php?a=promote&id=<?php echo $userID; ?>"><i class="fa fa-fw fa-angle-double-up"></i></a>
+          <a href="./action.php?a=demote&id=<?php echo $userID; ?>"><i class="fa fa-fw fa-angle-double-down"></i></a>
+<?php
+              };
+              if($userPerms == 0) {
+?>
+          <a href="./action.php?a=promote&id=<?php echo $userID; ?>"><i class="fa fa-fw fa-angle-double-up"></i></a>
+<?php
+              };
+            };
+?>
         </td>
       </tr>
 <?php

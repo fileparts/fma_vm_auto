@@ -369,6 +369,7 @@ a.btn-grp:last-child {
 div.date-controls {
 
 }
+  div.admin-controls > *,
   div.date-controls > * {
     float:right;
   }
@@ -403,6 +404,8 @@ table.date-calendar {
       height:130px;
       position:absolute;
       top:0;left:0;
+
+      z-index:97;
     }
     table.date-calendar tr > *.date > form.date-book {
       width:300px;
@@ -417,6 +420,9 @@ table.date-calendar {
       box-shadow:0 2px 10px #DDD;
 
       z-index:98;
+    }
+    #calendar > tbody > tr > td > form > div > a {
+      display:inline-block;
     }
     table.date-calendar tr > *.date > form.date-book input {
       width:100%;

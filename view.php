@@ -201,7 +201,7 @@ $calDate 		= 0;
     <td>
 <?php
                     if($machinePurposeID != NULL) {
-                      $getMachinePurposeName = $con->prepare("SELECT machinePurposeName FROM machinePurposes WHERE machinePurposeID=?");
+                      $getMachinePurposeName = $con->prepare("SELECT machinePurpose FROM machinePurposes WHERE purposeID=?");
                       $getMachinePurposeName->bind_param("i", $machinePurposeID);
                       $getMachinePurposeName->execute();
                       $getMachinePurposeName->store_result();
@@ -214,23 +214,23 @@ $calDate 		= 0;
                       $getMachinePurposeName->close();
                     } else {
 ?>
-    <p class="danger">Undefined</p>
+      <p class="danger">Undefined</p>
 <?php
                     };
 ?>
-    </td>
-    <td>
+              </td>
+              <td>
 <?php
                     if($machineUsageID != NULL) {
-                      $getMachineUsageName = $con->prepare("SELECT machineUsageName FROM machineUsages WHERE machineUsageID=?");
+                      $getMachineUsageName = $con->prepare("SELECT machineUsage FROM machineUsages WHERE usageID=?");
                       $getMachineUsageName->bind_param("i", $machineUsageID);
                       $getMachineUsageName->execute();
                       $getMachineUsageName->store_result();
                       $getMachineUsageName->bind_result($machineUsageName);
                       while($getMachineUsageName->fetch()) {
-?>
+  ?>
       <p><?php echo $machineUsageName; ?></p>
-<?php
+  <?php
                       };
                       $getMachineUsageName->close();
                     } else {
@@ -295,13 +295,13 @@ $calDate 		= 0;
               $getMachineDetails->bind_param("i", $machineID);
               $getMachineDetails->execute();
               $getMachineDetails->store_result();
-              $getMachineDetails->bind_result($machineMemory,$machineDiskSpace,$machineCores,$machinePurpose,$machineUsage,$machineOS);
+              $getMachineDetails->bind_result($machineMemory,$machineDiskSpace,$machineCores,$machinePurposeID,$machineUsageID,$machineOS);
               while($getMachineDetails->fetch()) {
                 $machineMemory = $machineMemory;
                 $machineDiskSpace = $machineDiskSpace;
                 $machineCores = $machineCores;
-                $machinePurpose = $machinePurpose;
-                $machineUsage = $machineUsage;
+                $machinePurposeID = $machinePurposeID;
+                $machineUsageID = $machineUsageID;
                 $machineOS = $machineOS;
               };
               $getMachineDetails->close();
@@ -318,9 +318,9 @@ $calDate 		= 0;
                 $getMachineOS->close();
               };
 
-              if($machinePurpose != NULL) {
-                $getMachinePurpose = $con->prepare("SELECT machinePurposeName FROM machinePurposes WHERE machinePurposeID=?");
-                $getMachinePurpose->bind_param("i", $machinePurpose);
+              if($machinePurposeID != NULL) {
+                $getMachinePurpose = $con->prepare("SELECT machinePurpose FROM machinePurposes WHERE purposeID=?");
+                $getMachinePurpose->bind_param("i", $machinePurposeID);
                 $getMachinePurpose->execute();
                 $getMachinePurpose->store_result();
                 $getMachinePurpose->bind_result($machinePurposeName);
@@ -330,9 +330,9 @@ $calDate 		= 0;
                 $getMachinePurpose->close();
               };
 
-              if($machineUsage != NULL) {
-                $getMachineUsage = $con->prepare("SELECT machineUsageName FROM machineUsages WHERE machineUsageID=?");
-                $getMachineUsage->bind_param("i", $machineUsage);
+              if($machineUsageID != NULL) {
+                $getMachineUsage = $con->prepare("SELECT machineUsage FROM machineUsages WHERE usageID=?");
+                $getMachineUsage->bind_param("i", $machineUsageID);
                 $getMachineUsage->execute();
                 $getMachineUsage->store_result();
                 $getMachineUsage->bind_result($machineUsageName);
@@ -493,13 +493,7 @@ $calDate 		= 0;
           $dayCount = $temp_dayCount;
         };
       };
-?>
-  <script>
-    $(document).ready(function() {
-      console.log("<?php echo $key; ?> : <?php echo $date; ?>");
-    });
-  </script>
-<?php
+
       if($date != "") {
         if($getUserName = $con->prepare("SELECT userFirst,userLast,userEmail FROM users WHERE userID=?")) {
           $getUserName->bind_param("i", $date['user']);

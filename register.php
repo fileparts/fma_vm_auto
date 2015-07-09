@@ -54,9 +54,17 @@ $(document).ready(function() {
   <div class="main wrp">
     <div class="clr">
       <?php
-    if(!isset($_SESSION['vm_userID'])) {
+    if(!isset($_SESSION['vm_userID']) || $_SESSION['vm_userPerms'] > 3) {
+    if($_SESSION['vm_userPerms'] > 3) {
+      ?>
+      <h1>Create a User</h1>
+      <?php
+    } else {
       ?>
       <h1>Register</h1>
+      <?php
+    };
+      ?>
       <form class="mrg-top-lrg" method="post" action="./action.php?a=register">
         <table class="fixed">
           <tr>
@@ -85,12 +93,30 @@ $(document).ready(function() {
           </tr>
           <tr>
             <td></td>
-            <td><button class="btn-default" type="submit">Register</button></td>
+            <td>
+                <?php
+              if($_SESSION['vm_userPerms'] > 3) {
+                ?>
+                <button class="btn-default" type="submit">Submit</button>
+                <?php
+              } else {
+                ?>
+                <button class="btn-default" type="submit">Register</button>
+                <?php
+              };
+                ?>
+            </td>
           </tr>
+<?php
+  if(!$_SESSION['vm_userPerms'] > 3) {
+?>
           <tr>
             <td></td>
             <td><a class="mrg-top-lrg" href="./login.php">Already have an Account?</a></td>
           </tr>
+<?php
+  };
+?>
         </table>
       </form>
       <?php
