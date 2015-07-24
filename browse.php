@@ -7,7 +7,7 @@
   <?php include('./nav.php'); ?>
   <div class="main wrp">
   <?php
-  if(isset($_SESSION['vm_userID'])) {
+  if(isset($_SESSION['userID'])) {
   ?>
     <h1 class="mrg-btm-x-lrg">Browse</h1>
     <table class="full outline mrg-btm-med">
@@ -15,7 +15,7 @@
         <td colspan="3"><p>Hosts</p></td>
       </tr>
   <?php
-    $listHosts = $con->prepare("SELECT hostID,hostIP,hostName FROM hosts WHERE hostPerms=1");
+    $listHosts = $con->prepare("SELECT hostID,hostIP,hostName FROM hosts WHERE hostPerms=1 ORDER BY hostID ASC");
     $listHosts->execute();
     $listHosts->store_result();
     if($listHosts->num_rows > 0) {
@@ -48,7 +48,7 @@
         <td colspan="7"><p>Machines</p></td>
       </tr>
   <?php
-        $listMachines = $con->prepare("SELECT machineID,machineIP,machineName,hostID FROM machines WHERE machinePerms=1");
+        $listMachines = $con->prepare("SELECT machineID,machineIP,machineName,hostID FROM machines WHERE machinePerms=1 ORDER BY hostID ASC");
         $listMachines->execute();
         $listMachines->store_result();
         if($listMachines->num_rows > 0) {

@@ -4,7 +4,7 @@
   $needle = strtolower($_POST['input']);
 
   if(strlen($needle) > 0) {
-    $checkUsername = $con->prepare("SELECT * FROM users WHERE userName=?");
+    $checkUsername = $users->prepare("SELECT * FROM users WHERE userName=?");
     $checkUsername->bind_param("s", $needle);
     $checkUsername->execute();
     $checkUsername->store_result();

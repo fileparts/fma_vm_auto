@@ -7,7 +7,7 @@
   <?php include('./nav.php'); ?>
   <div class="main wrp">
 <?php
-  if($_SESSION['vm_userPerms'] > 3) {
+  if($_SESSION['userPerms'] > 3) {
 ?>
     <div class="clr mrg-btm-x-lrg">
       <h1>Admin Control Panel</h1>
@@ -21,15 +21,14 @@
           <td>
             <a class="btn btn-grp" href="./create.php?t=h">Host</a>
             <a class="btn btn-grp" href="./create.php?t=us">Usage</a>
-            <a class="btn btn-grp" href="./register.php">User</a>
           </td>
           <td>
             <p>View: </p>
           </td>
           <td>
             <a class="btn btn-grp" href="./admin.php?v=h">Hosts</a>
+            <a class="btn btn-grp" href="./admin.php?v=u">Usages</a>
             <a class="btn btn-grp" href="./admin.php?v=m">Machines</a>
-            <a class="btn btn-grp" href="./admin.php?v=u">Users</a>
             <a class="btn btn-grp" href="./admin.php">Default</a>
           </td>
         </tr>
@@ -70,6 +69,43 @@
 <?php
         };
 $listHosts->close();
+?>
+    </table>
+<?php
+  };
+  if(!isset($_GET['v']) || $_GET['v'] == "u") {
+?>
+    <table class="full outline mrg-btm-med">
+      <tr class="head">
+        <td colspan="2"><p>Usages</p></td>
+      </tr>
+<?php
+        $listUsages = $con->prepare("SELECT usageID,machineUsage FROM machineusages");
+        $listUsages->execute();
+        $listUsages->store_result();
+        if($listUsages->num_rows > 0) {
+          $listUsages->bind_result($usageID,$machineUsage);
+          while($listUsages->fetch()) {
+?>
+      <tr>
+        <td><p><?php echo $machineUsage; ?></p></td>
+        <td class="fixed-100 options">
+          <a href="./edit.php?t=u&id=<?php echo $usageID; ?>"><i class="fa fa-fw fa-wrench"></i></a>
+          <?php
+
+          ?>
+        </td>
+      </tr>
+<?php
+          };
+        } else {
+?>
+      <tr>
+        <td><p class="alert">No Usages Found</p></td>
+      </tr>
+<?php
+        };
+        $listUsages->close();
 ?>
     </table>
 <?php
@@ -200,64 +236,6 @@ $listHosts->close();
 <?php
         };
         $listMachines->close();
-?>
-    </table>
-<?php
-  };
-  if(!isset($_GET['v']) || $_GET['v'] == "u") {
-?>
-    <table class="full outline">
-      <tr class="head">
-        <td colspan="4">
-          <p>Users</p>
-        </td>
-      </tr>
-<?php
-        $getUsers = $con->prepare("SELECT userID,userName,userFirst,userLast,userEmail,userPerms FROM users");
-        $getUsers->execute();
-        $getUsers->store_result();
-        if($getUsers->num_rows > 0) {
-          $getUsers->bind_result($userID,$userName,$userFirst,$userLast,$userEmail,$userPerms);
-          while($getUsers->fetch()) {
-?>
-      <tr>
-        <td><p><?php echo $userName; ?></p></td>
-        <td><p><?php echo $userFirst. ' ' .$userLast; ?></p></td>
-        <td><a href="mailto:<?php echo $userEmail; ?>"><?php echo $userEmail; ?></a></td>
-        <td class="fixed-100 options">
-<?php
-            if($userPerms != 5) {
-?>
-          <a href="./edit.php?t=u&id=<?php echo $userID; ?>"><i class="fa fa-fw fa-wrench"></i></a>
-<?php
-              if($userPerms == 4) {
-?>
-          <a href="./action.php?a=demote&id=<?php echo $userID; ?>"><i class="fa fa-fw fa-angle-double-down"></i></a>
-<?php
-              };
-              if($userPerms < 4 && $userPerms > 0) {
-?>
-          <a href="./action.php?a=promote&id=<?php echo $userID; ?>"><i class="fa fa-fw fa-angle-double-up"></i></a>
-          <a href="./action.php?a=demote&id=<?php echo $userID; ?>"><i class="fa fa-fw fa-angle-double-down"></i></a>
-<?php
-              };
-              if($userPerms == 0) {
-?>
-          <a href="./action.php?a=promote&id=<?php echo $userID; ?>"><i class="fa fa-fw fa-angle-double-up"></i></a>
-<?php
-              };
-            };
-?>
-        </td>
-      </tr>
-<?php
-          };
-        } else {
-?>
-      <tr><td><p class="alert">No Users Found</p></td></tr>
-<?php
-        };
-        $getUsers->close();
 ?>
     </table>
 <?php

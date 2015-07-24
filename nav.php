@@ -1,8 +1,9 @@
 <div class="nav">
   <ul class="wrp">
+    <li><a href="../">Return to Projects</a></li>
     <li><a href="./"><i class="fa fa-fw fa-home"></i> Home</a></li>
     <?php
-  if(isset($_SESSION['vm_userID'])) {
+  if(isset($_SESSION['userID'])) {
     ?>
     <li><a href="./browse.php"><i class="fa fa-fw fa-archive"></i> Browse</a></li>
     <li><a href="./search.php"><i class="fa fa-fw fa-search"></i> Search</a></li>
@@ -11,17 +12,13 @@
     ?>
     <ul>
       <?php
-    if(!isset($_SESSION['vm_userID'])) {
-      ?>
-      <li><a href="./login.php"><i class="fa fa-fw fa-lock"></i> Login</a></li>
-      <?php
-    } else {
+    if(isset($_SESSION['userID'])) {
       ?>
       <li><a href="./logout.php"><i class="fa fa-fw fa-unlock-alt"></i> Logout</a></li>
       <?php
     };
 
-    if(isset($_SESSION['vm_userID']) && $_SESSION['vm_userPerms'] > 3) {
+    if(isset($_SESSION['userID']) && $_SESSION['userPerms'] > 3) {
       ?>
       <li><a href="./admin.php"><i class="fa fa-fw fa-cog"></i> Admin</a></li>
       <?php

@@ -7,7 +7,7 @@
   <?php include('./nav.php'); ?>
   <div class="main wrp">
     <?php
-  if(isset($_SESSION['vm_userID'])) {
+  if(isset($_SESSION['userID'])) {
     ?>
     <p class="alert">Logging Out...</p>
     <?php

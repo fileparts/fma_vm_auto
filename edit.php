@@ -7,7 +7,7 @@
   <?php include('./nav.php'); ?>
   <div class="main wrp">
 <?php
-  if($_SESSION['vm_userPerms'] > 3) {
+  if($_SESSION['userPerms'] > 3) {
     if(isset($_GET['t'])) {
       if(isset($_GET['id'])) {
         $editType = $_GET['t'];
@@ -259,49 +259,29 @@
         </tr>
       </table>
     </form>
-<?php
-          } else {
-?>
+    <?php } else { ?>
     <p class="alert">invalid machine id, redirecting...</p>
 <?php
             redirect("./admin.php");
           };
           $checkID->close();
         } else if($editType == "u") {
-          $checkID = $con->prepare("SELECT userID,userName,userFirst,userLast,userEmail FROM users WHERE userID=?");
-          $checkID->bind_param("i", $editID);
-          $checkID->execute();
-          $checkID->store_result();
-          if($checkID->num_rows > 0) {
-            $checkID->bind_result($userID,$userName,$userFirst,$userLast,$userEmail);
-            while($checkID->fetch()) {
-              $userID = $userID;
-              $userName = $userName;
-              $userFirst = $userFirst;
-              $userLast = $userLast;
-              $userEmail = $userEmail;
-            };
+          $getUsage = $con->prepare("SELECT usageID,machineUsage FROM machineusages WHERE usageID=?");
+          $getUsage->bind_param("i", $editID);
+          $getUsage->execute();
+          $getUsage->store_result();
+          if($getUsage->num_rows > 0) {
+            $getUsage->bind_result($usageID,$usageName);
+            while($getUsage->fetch()) {
 ?>
-    <form class="mrg-btm-x-lrg" method="post" action="./action.php?a=edit">
-      <input name="formID" type="hidden" value="<?php echo $userID; ?>" required />
+    <form method="post" action="./action.php?a=edit">
+      <input name="formID" type="hidden" value="<?php echo $usageID; ?>" required />
       <input name="editType" type="hidden" value="<?php echo $editType; ?>" required />
-      <h1 class="mrg-btm-x-lrg">Edit <?php echo $userName; ?> / <?php echo $userFirst; ?> <?php echo $userLast; ?></h1>
+      <h1 class="mrg-btm-x-lrg">Edit <?php echo $usageName; ?></h1>
       <table class="fixed">
         <tr>
-          <td><p>Edit Username</p></td>
-          <td><input name="formName" type="text" value="<?php echo $userName; ?>" autocomplete="off" autofocus required /></td>
-        </tr>
-        <tr>
-          <td><p>Edit First Name(s)</p></td>
-          <td><input name="formFirst" type="text" value="<?php echo $userFirst; ?>" autocomplete="off" autofocus required /></td>
-        </tr>
-        <tr>
-          <td><p>Edit Last Name(s)</p></td>
-          <td><input name="formLast" type="text" value="<?php echo $userLast; ?>" autocomplete="off" autofocus required /></td>
-        </tr>
-        <tr>
-          <td><p>Edit Email Address</p></td>
-          <td><input name="formEmail" type="email" value="<?php echo $userEmail; ?>" autocomplete="off" autofocus required /></td>
+          <td><p>Edit Usage Name</p></td>
+          <td><input name="formName" type="text" value="<?php echo $usageName; ?>" placeholder="Usage Name" autocomplete="off" autofocus required />
         </tr>
         <tr>
           <td></td>
@@ -309,34 +289,14 @@
         </tr>
       </table>
     </form>
-    <div class="clr">
-      <form class="mrg-btm-x-lrg" method="post" action="./action.php?a=edit">
-        <input name="formID" type="hidden" value="<?php echo $userID; ?>" required />
-        <input name="editType" type="hidden" value="up" required />
-        <table class="fixed">
-          <tr>
-            <td><p>New Password</p></td>
-            <td><input name="formPass" type="password" placeholder="Password" autocomplete="off" autofocus required /></td>
-          </tr>
-          <tr>
-            <td><p>Retype Password</p></td>
-            <td><input name="rePass" type="password" placeholder="Retype Password" autocomplete="off" autofocus required /></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td><button class="btn-warning confirm">Submit</button></td>
-          </tr>
-        </table>
-      </form>
-  </div>
 <?php
-          } else {
+            };
+        } else {
 ?>
-    <p class="alert">invalid user id, redirecting...</p>
+    <p class="alert">invalid usage id, redirecting...</p>
 <?php
             redirect("./admin.php");
           };
-          $checkID->close();
         } else {
 ?>
     <p class="alert">a valid edit type is required, redirecting...</p>
@@ -345,7 +305,7 @@
         };
       } else {
 ?>
-    <p class="alert">an edit id is reuqired, redirecting...</p>
+    <p class="alert">an edit id is required, redirecting...</p>
 <?php
         redirect("./admin.php");
       };

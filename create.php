@@ -7,7 +7,7 @@
   <?php include('./nav.php'); ?>
   <div class="main wrp">
 <?php
-    if($_SESSION['vm_userPerms'] > 3) {
+    if($_SESSION['userPerms'] > 3) {
       if(isset($_GET['t'])) {
         $creationType = $_GET['t'];
 

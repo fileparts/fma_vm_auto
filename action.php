@@ -11,90 +11,7 @@
     $action = $_GET['a'];
     $okay = false;
 
-    if($action == "register") {
-      $formName = strtolower($_POST['formName']);
-      $formEmail = $_POST['formEmail'];
-      $formFirst = $_POST['formFirst'];
-      $formLast = $_POST['formLast'];
-      $formPass = $_POST['formPass'];
-      $formPass = crypt($formPass, $cryptSalt);
-
-      $checkUsername = $con->prepare("SELECT * FROM users WHERE userName=?");
-      $checkUsername->bind_param("s", $formName);
-      $checkUsername->execute();
-      $checkUsername->store_result();
-      if($checkUsername->num_rows > 0) {
-  ?>
-    <p class="alert">Username is already taken, redirecting...</p>
-  <?php
-        redirect("./login.php");
-      } else {
-        $okay = true;
-      };
-      $checkUsername->close();
-
-      if($okay == true) {
-        $createUser = $con->prepare("INSERT INTO users(userName,userEmail,userFirst,userLast,userPass) VALUES(?,?,?,?,?)");
-        $createUser->bind_param("sssss", $formName,$formEmail,$formFirst,$formLast,$formPass);
-        if($createUser->execute()) {
-  ?>
-    <p class="alert">User successfully created, redirecting...</p>
-  <?php
-          if($_SESSION['vm_userPerms'] > 3) {
-            redirect("./admin.php");
-          } else{
-            redirect("./login.php");
-          };
-        } else {
-  ?>
-    <p class="alert">Users unsuccessfully created, redirecting...</p>
-  <?php
-          redirect("./register.php");
-        };
-        $createUser->close();
-      };
-    } else if($action == "login") {
-      $formName = strtolower($_POST['formName']);
-      $formPass = $_POST['formPass'];
-      $formPass = crypt($formPass, $cryptSalt);
-
-      $checkUsername = $con->prepare("SELECT * FROM users WHERE userName=?");
-      $checkUsername->bind_param("s", $formName);
-      $checkUsername->execute();
-      $checkUsername->store_result();
-      if($checkUsername->num_rows > 0) {
-        $okay = true;
-      } else {
-  ?>
-    <p class="alert">Username not found, redirecting...</p>
-  <?php
-        redirect("./register.php");
-      };
-      $checkUsername->close();
-
-      if($okay == true) {
-        $checkPassword = $con->prepare("SELECT userID,userPass,userPerms FROM users WHERE userName=?");
-        $checkPassword->bind_param("s", $formName);
-        $checkPassword->execute();
-        $checkPassword->bind_result($userID,$userPass,$userPerms);
-        while($checkPassword->fetch()) {
-          if($userPass == $formPass) {
-  ?>
-    <p class="alert">Logging In, redirecting...</p>
-  <?php
-            $_SESSION['vm_userID'] = $userID;
-            $_SESSION['vm_userPerms'] = $userPerms;
-            redirect("./");
-          } else {
-  ?>
-    <p class="alert">Incorrect Password, redirecting...</p>
-  <?php
-            redirect("./login.php");
-          };
-        };
-        $checkPassword->close();
-      };
-    } else if($action == "book") {
+    if($action == "book") {
       $userID 						= $_POST['userID'];
 			$machineID 					= $_POST['machineID'];
 			$bookingStartDate 		= $_POST['formStart'];
@@ -190,7 +107,7 @@
 			};
 			$checkDates->close();
     } else if($action == "edit") {
-      if($_SESSION['vm_userPerms'] > 3) {
+      if($_SESSION['userPerms'] > 3) {
         $editType = $_POST['editType'];
         $formID = $_POST['formID'];
         $formIP = $_POST['formIP'];
@@ -270,63 +187,33 @@
           };
           $checkID->close();
         } else if($editType == "u") {
-          $checkID = $con->prepare("SELECT * FROM users WHERE userID=?");
+          $checkID = $con->prepare("SELECT * FROM machineusages WHERE usageID=?");
           $checkID->bind_param("i", $formID);
           $checkID->execute();
           $checkID->store_result();
           if($checkID->num_rows > 0) {
-            $editUser = $con->prepare("UPDATE users SET userName=?,userFirst=?,userLast=?,userEmail=? WHERE userID=?");
-            $editUser->bind_param("ssssi", $formName,$formFirst,$formLast,$formEmail,$formID);
-            if($editUser->execute()) {
+            $editUsage = $con->prepare("UPDATE machineusages SET machineUsage=? WHERE usageID=?");
+            $editUsage->bind_param("si", $formName,$formID);
+            if($editUsage->execute()) {
 ?>
-    <p class="alert">User successfully updated, redirecting...</p>
-<?php
-                redirect("./admin.php");
-              } else {
-?>
-    <p class="alert">User unsuccessfully updated, redirecting...</p>
-<?php
-                redirect("./edit.php?t=u&id=$formID");
-              };
-            $editUser->close();
-          } else {
-?>
-    <p class="alert">invalid user id, redirecting...</p>
-<?php
-            redirect("./admin.php");
-          };
-          $checkID->close();
-        } else if($editType == "up") {
-          $checkID = $con->prepare("SELECT * FROM users WHERE userID=?");
-          $checkID->bind_param("i", $formID);
-          $checkID->execute();
-          $checkID->store_result();
-          if($checkID->num_rows > 0) {
-            $formPass = $_POST['formPass'];
-            $formPass = crypt($formPass, $cryptSalt);
-
-            $editPassword = $con->prepare("UPDATE users SET userPass=? WHERE userID=?");
-            $editPassword->bind_param("si", $formPass,$formID);
-            if($editPassword->execute()) {
-?>
-  <p class="alert">User password successfully updated, redirecting...</p>
+    <p class="alert">Usage Successfully updated, redirecting...</p>
 <?php
               redirect("./admin.php");
             } else {
 ?>
-  <p class="alert">User password unsuccessfully updated, redirecting...</p>
+    <p class="alert">Usage unsuccessfully updated, redirecting...</p>
 <?php
               redirect("./edit.php?t=u&id=$formID");
             };
-            $editPassword->close();
+            $editUsage->close();
           } else {
 ?>
-    <p class="alert">invalid user id, redirecting...</p>
+    <p class="alert">invalid usage id, redirecting...</p>
 <?php
             redirect("./admin.php");
           };
           $checkID->close();
-        }else {
+        } else {
 ?>
     <p class="alert">a valid edit type is required, redirecting...</p>
 <?php
@@ -344,7 +231,7 @@
       $formIP = $_POST['formIP'];
       $formPerms = $_POST['formPerms'];
 
-      if($_SESSION['vm_userPerms'] > 3) {
+      if($_SESSION['userPerms'] > 3) {
         if($creationType == "h") {
           $checkName = $con->prepare("SELECT * FROM hosts WHERE hostName=?");
           $checkName->bind_param("s", $formName);
@@ -412,11 +299,11 @@
         redirect("./");
       };
     } else if($action == "promote") {
-      if($_SESSION['vm_userPerms'] > 0) {
+      if($_SESSION['userPerms'] > 3) {
         if(isset($_GET['id'])) {
           $userID = $_GET['id'];
 
-          $checkID = $con->prepare("SELECT userPerms FROM users WHERE userID=?");
+          $checkID = $users->prepare("SELECT userPerms FROM users WHERE userID=?");
           $checkID->bind_param("i", $userID);
           $checkID->execute();
           $checkID->store_result();
@@ -424,7 +311,7 @@
             $checkID->bind_result($userPerms);
             while($checkID->fetch()) {
               if($userPerms == 1) {
-                $promote = $con->prepare("UPDATE users SET userPerms=4 WHERE userID=?");
+                $promote = $users->prepare("UPDATE users SET userPerms=4 WHERE userID=?");
                 $promote->bind_param("i", $userID);
                 if($promote->execute()) {
 ?>
@@ -439,7 +326,7 @@
                 };
                 $promote->close();
               } else if($userPerms == 0) {
-                $promote = $con->prepare("UPDATE users SET userPerms=1 WHERE userID=?");
+                $promote = $users->prepare("UPDATE users SET userPerms=1 WHERE userID=?");
                 $promote->bind_param("i", $userID);
                 if($promote->execute()) {
 ?>
@@ -475,11 +362,11 @@
         redirect("./");
       };
     } else if($action == "demote") {
-      if($_SESSION['vm_userPerms'] > 0) {
+      if($_SESSION['userPerms'] > 3) {
         if(isset($_GET['id'])) {
           $userID = $_GET['id'];
 
-          $checkID = $con->prepare("SELECT userPerms FROM users WHERE userID=?");
+          $checkID = $users->prepare("SELECT userPerms FROM users WHERE userID=?");
           $checkID->bind_param("i", $userID);
           $checkID->execute();
           $checkID->store_result();
@@ -487,7 +374,7 @@
             $checkID->bind_result($userPerms);
             while($checkID->fetch()) {
               if($userPerms == 4) {
-                $demote = $con->prepare("UPDATE users SET userPerms=1 WHERE userID=?");
+                $demote = $users->prepare("UPDATE users SET userPerms=1 WHERE userID=?");
                 $demote->bind_param("i", $userID);
                 if($demote->execute()) {
   ?>
@@ -502,7 +389,7 @@
                 };
                 $demote->close();
               } else if($userPerms == 1) {
-                $demote = $con->prepare("UPDATE users SET userPerms=0 WHERE userID=?");
+                $demote = $users->prepare("UPDATE users SET userPerms=0 WHERE userID=?");
                 $demote->bind_param("i", $userID);
                 if($demote->execute()) {
   ?>
@@ -538,51 +425,82 @@
         redirect("./");
       };
     } else if($action == "deletebooking") {
-      if($_SESSION['vm_userPerms'] > 3) {
         if(isset($_GET['id'])) {
           $bookingID = $_GET['id'];
+          $machineID = $_GET['vm'];
 
-          $checkID = $con->prepare("SELECT bookingID FROM bookings WHERE bookingID=?");
-          $checkID->bind_param("i", $bookingID);
-          $checkID->execute();
-          $checkID->store_result();
-          if($checkID->num_rows > 0) {
-            $checkID->bind_result($bookingID);
-            while($checkID->fetch()) {
-              $deleteBooking = $con->prepare("DELETE FROM bookings WHERE bookingID=?");
-              $deleteBooking->bind_param("i", $bookingID);
-              if($deleteBooking->execute()) {
+          if($_SESSION['userPerms'] > 3) {
+            $checkID = $con->prepare("SELECT bookingID FROM bookings WHERE bookingID=?");
+            $checkID->bind_param("i", $bookingID);
+            $checkID->execute();
+            $checkID->store_result();
+            if($checkID->num_rows > 0) {
+              $checkID->bind_result($bookingID);
+              while($checkID->fetch()) {
+                $deleteBooking = $con->prepare("DELETE FROM bookings WHERE bookingID=?");
+                $deleteBooking->bind_param("i", $bookingID);
+                if($deleteBooking->execute()) {
 ?>
     <p class="alert">Booking successfully deleted, redirecting...</p>
 <?php
-                redirect("./browse.php");
-              } else {
+                  redirect("./view.php?t=m&id=$machineID");
+                } else {
 ?>
     <p class="alert">Booking unsuccessfully deleted, redirecting...</p>
 <?php
-                redirect("./browse.php");
+                  redirect("./view.php?t=m&id=$machineID");
+                };
+                $deleteBooking->close();
               };
-              $deleteBooking->close();
-            };
-          } else {
+            } else {
 ?>
     <p class="alert">invalid booking id, redirecting...</p>
 <?php
+              redirect("./browse.php");
+            };
+            $checkID->close();
+          } else if($_SESSION['userPerms'] < 4) {
+            $checkID = $con->prepare("SELECT bookingID FROM bookings WHERE bookingID=? AND userID=?");
+            $checkID->bind_param("ii", $bookingID, $_SESSION['userID']);
+            $checkID->execute();
+            $checkID->store_result();
+            if($checkID->num_rows > 0) {
+              $checkID->bind_result($bookingID);
+              while($checkID->fetch()) {
+                $deleteBooking = $con->prepare("DELETE FROM bookings WHERE bookingID=?");
+                $deleteBooking->bind_param("i", $bookingID);
+                if($deleteBooking->execute()) {
+?>
+    <p class="alert">Booking successfully deleted, redirecting...</p>
+<?php
+                  redirect("./browse.php");
+                } else {
+?>
+    <p class="alert">Booking unsuccessfully deleted, redirecting...</p>
+<?php
+                  redirect("./browse.php");
+                };
+                $deleteBooking->close();
+              };
+            } else {
+?>
+    <p class="alert">invalid booking id, redirecting...</p>
+<?php
+              redirect("./browse.php");
+            };
+            $checkID->close();
+          } else {
+?>
+    <p class="alert">you do not have permission to view this page, redirecting...</p>
+<?php
             redirect("./browse.php");
           };
-          $checkID->close();
         } else {
 ?>
     <p class="alert">a booking id is required, redirecting...</p>
 <?php
           redirec("./browse.php");
         };
-      } else {
-?>
-    <p class="alert">you do not have permission to view this page, redirecting...</p>
-<?php
-        redirec("./browse.php");
-      };
     } else {
   ?>
     <p class="alert">A Valid Action is Required...</p>

@@ -112,7 +112,7 @@ $calDate 		= 0;
   <?php include('./nav.php'); ?>
   <div class="main wrp">
   <?php
-  if(isset($_SESSION['vm_userID'])) {
+  if(isset($_SESSION['userID'])) {
     if(isset($_GET['t'])) {
       if(isset($_GET['id'])) {
         $type = $_GET['t'];
@@ -138,7 +138,7 @@ $calDate 		= 0;
   </tr>
 
 <?php
-              $getChildren = $con->prepare("SELECT hostID,machineID,machineIP,machineName FROM machines WHERE hostID=?");
+              $getChildren = $con->prepare("SELECT hostID,machineID,machineIP,machineName FROM machines WHERE hostID=? ORDER BY hostID ASC");
               $getChildren->bind_param("i", $hostID);
               $getChildren->execute();
               $getChildren->store_result();
@@ -351,12 +351,12 @@ $calDate 		= 0;
       <td colspan="6"><p>Machine Details</p></td>
     </tr>
     <tr>
-      <td><p><b>Host IP</b></p></td>
+      <td><p><b>Host Name</b></p></td>
       <td>
 <?php
               if($hostID != NULL) {
 ?>
-        <a href="./view.php?t=h&id=<?php echo $hostID; ?>"><?php echo $hostIP; ?></a>
+        <a href="./view.php?t=h&id=<?php echo $hostID; ?>"><?php echo $hostName; ?></a>
 <?php
               } else {
 ?>
@@ -515,11 +515,11 @@ $calDate 		= 0;
 <td class="date">
   <p><?php echo $calDate; ?></p>
 <?php
-  if($_SESSION['vm_userPerms'] > 0) {
+  if($_SESSION['userPerms'] > 0) {
 ?>
   <a class="date-bookNow"></a>
   <form class="date-book" method="post" action="./action.php?a=book">
-    <input name="userID" type="hidden" value="<?php echo $_SESSION['vm_userID']; ?>" required />
+    <input name="userID" type="hidden" value="<?php echo $_SESSION['userID']; ?>" required />
     <input name="machineID" type="hidden" value="<?php echo $machineID; ?>" required />
 
     <div class="clr mrg-btm-med options">
@@ -593,14 +593,14 @@ $calDate 		= 0;
       <td><p><?php echo $bookingStart; ?> <i class="fa fa-fw fa-angle-double-right"></i> <?php echo $bookingEnd; ?></p></td>
       <td class="fixed-100 options">
 <?php
-      if($_SESSION['vm_userPerms'] > 0) {
+      if($_SESSION['userPerms'] > 0) {
 ?>
         <a href="mailto:<?php echo $userEmail; ?>"><i class="fa fa-fw fa-bullhorn"></i></a>
 <?php
       };
-      if($_SESSION['vm_userPerms'] > 3) {
+      if($_SESSION['userPerms'] > 3 || $_SESSION['userID'] == $userID) {
 ?>
-        <a class="confirm" href="./action.php?a=deletebooking&id=<?php echo $bookingID; ?>"><i class="fa fa-fw fa-close"></i></a>
+        <a class="confirm" href="./action.php?a=deletebooking&id=<?php echo $bookingID; ?>&vm=<?php echo $machineID; ?>"><i class="fa fa-fw fa-close"></i></a>
 <?php
       };
 ?>

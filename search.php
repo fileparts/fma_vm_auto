@@ -34,7 +34,7 @@
   <?php include('./nav.php'); ?>
   <div class="main wrp">
   <?php
-    if(isset($_SESSION['vm_userID'])) {
+    if(isset($_SESSION['userID'])) {
   ?>
     <h1 class="mrg-btm-x-lrg">Search</h1>
     <form class="mrg-btm-med" method="post">
@@ -57,7 +57,7 @@
   ?>
     <p class="alert">You must be logged in to view this page, redirecting...</p>
   <?php
-      redirect("./login.php");
+      redirect("../login.php");
     };
   ?>
   </div>
